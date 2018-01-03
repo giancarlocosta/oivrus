@@ -1,0 +1,266 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Submission Service API",
+    "description": "",
+    "version": "1.0.0"
+  },
+  "host": "0.0.0.0:3000",
+  "schemes": [
+    "http"
+  ],
+  "basePath": "/api",
+  "produces": [
+    "application/json"
+  ],
+
+  "paths": {
+
+    "/events": {
+
+      "get": {
+        "description": "Get events",
+        "produces": [ "application/json" ],
+        "tags": ["events"],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "InvalidError",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "404": {
+            "description": "NotFoundError",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        },
+        "responseExample": "{\r\n    \"data\": {\r\n        \"id\": \"73d259a8-c7b6-46c9-9cf9-9438ecd875e9\",\r\n        \"code\": 0,\r\n        \"content\": \"Event test submission\",\r\n        \"description\": \"Catch all event\",\r\n        \"election\": \"e1\",\r\n        \"key\": \"DEFAULT_EVENT\",\r\n        \"entity\": \"user\",\r\n        \"domain\": \"voting\"        \"metadata\": {\r\n            \"received_time\": \"2017-07-24T03:02:38.894Z\"\r\n        },\r\n        \"period\": \"p1\",\r\n        \"severity\": \"info\",\r\n        \"source\": \"election-service\",\r\n        \"time\": \"2017-07-20T17:18:59.553Z\",\r\n        \"voter\": \"v1\"\r\n    }\r\n}"
+      },
+
+      "post": {
+        "description": "Create an event",
+        "produces": [ "application/json" ],
+        "tags": ["events"],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/event"
+            }
+          }
+        ],
+        "requestExample": "{\r\n        \"content\": \"Voter logged in\",\r\n        \"election\": \"e1\",\r\n        \"key\": \"AUTHENTICATION_SUCCESS\",\r\n        \"period\": \"p1\",\r\n        \"severity\": \"info\",\r\n        \"source\": \"vote-service\",\r\n        \"entity\": \"user\",\r\n        \"domain\": \"authentication\"        \"time\": \"2017-07-20T17:18:59.553Z\",\r\n        \"voter\": \"v1\"\r\n}",
+        "responses": {
+          "201": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "InvalidError",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "404": {
+            "description": "NotFoundError",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        },
+        "responseExample": "{\r\n    \"data\": {\r\n        \"id\": \"b492fedb-17eb-4e53-accd-4d1f27b8978e\",\r\n        \"code\": 1001,\r\n        \"content\": \"Voter logged in\",\r\n        \"description\": \"\",\r\n        \"election\": \"e1\",\r\n        \"key\": \"AUTHENTICATION_SUCCESS\",\r\n        \"entity\": \"user\",\r\n        \"domain\": \"authentication\"        \"metadata\": {\r\n            \"received_time\": \"2017-07-24T04:13:34.292Z\"\r\n        },\r\n        \"period\": \"p1\",\r\n        \"severity\": \"info\",\r\n        \"source\": \"vote-service\",\r\n        \"time\": \"2017-07-20T17:18:59.553Z\",\r\n        \"voter\": \"v1\"\r\n    }\r\n}"
+      }
+
+    },
+
+    "/events/{id}": {
+
+      "get": {
+        "description": "Returns the event with the provided ID",
+        "produces": [ "application/json" ],
+        "tags": ["events"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of resource to fetch",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/event"
+            }
+          },
+          "404": {
+            "description": "NotFoundError",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        },
+        "responseExample":"{\r\n    \"data\": [\r\n        {\r\n            \"id\": \"a8aec33c-c604-4a90-a90f-c2a953561c13\",\r\n            \"code\": 0,\r\n            \"content\": \"Test\",\r\n            \"description\": \"Catch all event\",\r\n            \"election\": \"\",\r\n            \"key\": \"DEFAULT_EVENT\",\r\n            \"metadata\": {\r\n                \"received_time\": \"2017-07-24T03:25:56.576Z\"\r\n            },\r\n            \"period\": \"\",\r\n            \"severity\": \"info\",\r\n            \"source\": \"election-service\",\r\n            \"time\": \"2017-07-20T17:18:59.553Z\",\r\n            \"voter\": \"\"\r\n        },\r\n        {\r\n            \"id\": \"a0bcd117-798b-4915-a081-664ab3bff154\",\r\n            \"code\": 0,\r\n            \"content\": \"Test\",\r\n            \"description\": \"Catch all event\",\r\n            \"election\": \"e1\",\r\n            \"key\": \"DEFAULT_EVENT\",\r\n            \"metadata\": {\r\n                \"received_time\": \"2017-07-24T03:25:56.620Z\"\r\n            },\r\n            \"period\": \"p1\",\r\n            \"severity\": \"info\",\r\n            \"source\": \"election-service\",\r\n            \"time\": \"2017-07-20T17:18:59.553Z\",\r\n            \"voter\": \"v1\"\r\n        },\r\n        {\r\n            \"id\": \"24275bee-0699-4761-b727-6ad5820f5a68\",\r\n            \"code\": 1001,\r\n            \"content\": \"Event test submission\",\r\n            \"description\": \"\",\r\n            \"election\": \"\",\r\n            \"key\": \"AUTHENTICATION_SUCCESS\",\r\n            \"metadata\": {\r\n                \"received_time\": \"2017-07-24T03:25:56.464Z\"\r\n            },\r\n            \"period\": \"\",\r\n            \"severity\": \"info\",\r\n            \"source\": \"election-service\",\r\n            \"time\": \"2017-07-20T17:18:59.553Z\",\r\n            \"voter\": \"\"\r\n        },\r\n        {\r\n            \"id\": \"b492fedb-17eb-4e53-accd-4d1f27b8978e\",\r\n            \"code\": 1001,\r\n            \"content\": \"Voter logged in\",\r\n            \"description\": \"\",\r\n            \"election\": \"e1\",\r\n            \"key\": \"AUTHENTICATION_SUCCESS\",\r\n            \"metadata\": {\r\n                \"received_time\": \"2017-07-24T04:13:34.292Z\"\r\n            },\r\n            \"period\": \"p1\",\r\n            \"severity\": \"info\",\r\n            \"source\": \"vote-service\",\r\n            \"time\": \"2017-07-20T17:18:59.553Z\",\r\n            \"voter\": \"v1\"\r\n        }\r\n    ],\r\n    \"pages\": {\r\n        \"index\": 0,\r\n        \"total\": 1,\r\n        \"items\": 4\r\n    }\r\n}"
+      }
+
+    }
+
+  },
+
+  "definitions": {
+
+    "event": {
+      "title": "Voting System Event",
+      "description": "An event created by the Voting System.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "title": "Event ID",
+          "description": "The unique identifier for an event.",
+          "type": "string",
+          "maxLength": 256,
+          "default": ""
+        },
+        "source": {
+          "title": "Event Source",
+          "description": "The creator of the event.",
+          "type": "string",
+          "maxLength": 256,
+          "default": ""
+        },
+        "key": {
+          "title": "Event Key",
+          "description": "The unique string identifier for an event.",
+          "type": "string",
+          "maxLength": 256,
+          "default": ""
+        },
+        "code": {
+          "title": "Event Code",
+          "description": "The integer identifier for an event.",
+          "type": "integer"
+        },
+        "timestamp": {
+          "title": "Event Timestamp",
+          "description": "The time the event was created.",
+          "type": "string",
+          "format": "date-time"
+        },
+        "severity": {
+          "title": "Event Severity",
+          "description": "The level of severity of an event (RFC5424 syslog levels).",
+          "type": "string",
+          "maxLength": 256,
+          "enum": ["emerg", "alert", "crit", "err", "warning", "notice", "info", "debug"],
+          "default": "info"
+        },
+        "entity": {
+          "title": "Event Entity",
+          "description": "Subject of the event (i.e. user, voter, application, etc.)",
+          "type": "string",
+          "maxLength": 256,
+          "default": ""
+        },
+        "domain": {
+          "title": "Event Domain",
+          "description": "The general (or specific) domain of the event (i.e. voting, authorization, etc.)",
+          "type": "string",
+          "maxLength": 256,
+          "default": ""
+        },
+        "election": {
+          "title": "Election ID",
+          "description": "A Reference to an election.",
+          "type": "string",
+          "maxLength": 256,
+          "default": ""
+        },
+        "period": {
+          "title": "Period ID",
+          "description": "A Reference to a period.",
+          "type": "string",
+          "maxLength": 256,
+          "default": ""
+        },
+        "voter": {
+          "title": "Voter ID",
+          "description": "A Reference to a voter.",
+          "type": "string",
+          "maxLength": 256,
+          "default": ""
+        },
+        "content": {
+          "title": "Event Content/Message(s)",
+          "description": "The message(s) associated with an event.",
+          "oneOf": [
+            { "type": "string" },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 1
+            }
+          ]
+        },
+        "metadata": {
+          "title": "Event Metadata",
+          "description": "Arbitrary additional string data to include in event.",
+          "type": ["object", "null"],
+          "patternProperties": {
+            "^[a-zA-Z0-9_]*$": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "default": {}
+        }
+      },
+      "required": [
+        "time",
+        "content"
+      ]
+    },
+
+    "Error": {
+      "type": "object",
+      "properties": {
+        "statusCode": {
+          "type": "integer",
+          "format": "int32",
+          "description": "HTTP Error code"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the error"
+        },
+        "message": {
+          "type": "string",
+          "description": "Basic error message"
+        },
+        "details": {
+          "type": "string",
+          "description": "Additional error details"
+        },
+        "code": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Sub error code (for different errors that must share same HTTP code)"
+        }
+      },
+      "required": [
+        "name",
+        "statusCode"
+      ]
+    }
+  }
+}

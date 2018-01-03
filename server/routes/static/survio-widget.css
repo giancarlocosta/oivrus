@@ -1,0 +1,31 @@
+#pollsContainer {
+    background-color: yellow;
+}
+
+.pollsContainer {
+    float: block;
+}
+
+.resultsContainer {
+  width: 50%;
+  float: right;
+}
+
+.optionsContainer {
+  width: 50%;
+  float: left;
+}
+
+.submitContainer {
+  width: 100%;
+}
+
+.text-box {
+    /*these two lines do the magic */
+    color: transparent;
+    text-shadow: 0px 0px 1px #000000;
+}
+
+.blur {
+   text-shadow: 0px 0px 10px #000000;
+}

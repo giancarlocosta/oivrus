@@ -1,0 +1,79 @@
+{
+  "name": "submission-service",
+  "description": "Stores submissions, and provides an interface for querying them.",
+  "version": "0.0.0",
+  "main": "server/server.js",
+  "publishConfig": {
+    "registry": "https://npm.e1c.net"
+  },
+  "engines": {
+    "node": ">= 6.0.0",
+    "npm": ">= 3.0.0"
+  },
+  "eslintConfig": {
+    "extends": [
+      "e1c/es6/node",
+      "e1c/test/mocha",
+      "e1c/test/chai"
+    ]
+  },
+  "scripts": {
+    "container": "node server/server.js",
+    "start": "node server/server.js",
+    "develop": ". env/dev.env && node_modules/.bin/nodemon server/server.js",
+    "test": "bin/test.sh",
+    "test-local": "bin/test-local.sh",
+    "coverage": "COVERAGE=true bin/test-local.sh",
+    "killservice": "bin/killservice.sh",
+    "lint": "bin/lint.sh",
+    "audit": "bin/audit.sh",
+    "document": "bin/document.sh",
+    "add-documentation": "git add doc readme.md"
+  },
+  "pre-commit": [
+    "audit",
+    "lint",
+    "document",
+    "add-documentation"
+  ],
+  "dependencies": {
+    "bluebird": "3.5.0",
+    "body-parser": "1.18.2",
+    "co-express": "1.2.2",
+    "cors": "^2.8.4",
+    "event-logger": "latest",
+    "evs-data-schemas": "latest",
+    "express": "4.16.1",
+    "express-cassandra": "1.9.0",
+    "express-prom-bundle": "3.0.0",
+    "express-request-id": "1.4.0",
+    "fs-promise": "0.3.1",
+    "helmet": "3.8.2",
+    "hpp": "0.2.2",
+    "lodash": "4.17.4",
+    "morgan": "1.9.0",
+    "promise-retry": "1.1.1",
+    "request-context": "2.0.0",
+    "request-promise": "3.0.0",
+    "requestretry": "1.12.2",
+    "service-logger": "latest",
+    "uuid": "3.1.0"
+  },
+  "devDependencies": {
+    "chai": "3.5.0",
+    "chai-http": "3.0.0",
+    "eslint-config-e1c": "4.1.0",
+    "express-swaggerize-ui": "1.0.1",
+    "istanbul-middleware": "0.2.3",
+    "jsdoc": "3.5.5",
+    "json-schema-faker": "0.3.7",
+    "lcov-summary": "1.0.1",
+    "mocha": "2.5.3",
+    "mockserver-client": "1.0.16",
+    "nock": "9.0.22",
+    "nodemon": "^1.12.1",
+    "nsp": "2.8.1",
+    "pre-commit": "1.2.2",
+    "swagger2md": "1.0.16"
+  }
+}

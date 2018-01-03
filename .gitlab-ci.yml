@@ -1,0 +1,68 @@
+# Execute on the Node6 runner
+image: gitlab.e1c.net:4567/ops/runners:node6
+
+
+# First build and test the branch, and then publish
+# and deploy if we're on the project's main branch
+stages:
+  - increment-version
+  - publish-branch-build
+  - publish-versioned-build
+  - deploy-versioned-build
+
+
+# Grab the helper scripts, and make sure variables are set
+before_script:
+  - git clone --depth 1 git@gitlab.e1c.net:ops/ci-scripts.git
+  - source ci-scripts/set-variables.sh
+
+
+# Increment the semantic version and tag the repository with it
+increment-version:
+  stage: increment-version
+  only:
+    - develop@evs/submission-service
+  script:
+    - ci-scripts/increment-version.sh
+
+
+# Check code coverage
+test-branch-coverage:
+  stage: publish-branch-build
+  only:
+    - branches
+  script:
+    - COVERAGE=true bin/test-local.sh docker
+
+
+# Construct a Docker image from the code, test it, and
+# if everything looks good push it to the Docker registry
+test-branch-build:
+  stage: publish-branch-build
+  only:
+    - branches
+  script:
+    - ci-scripts/build-image.sh
+    - ci-scripts/test-image.sh
+    - ci-scripts/push-image.sh
+
+
+# Tag the image with the semver and push it; also push a latest image
+publish-versioned-build:
+  stage: publish-versioned-build
+  only:
+    - develop@evs/submission-service
+  script:
+    - ci-scripts/publish-version.sh
+
+
+# Deploy the latest image to a development environment
+deploy-versioned-build:
+  stage: deploy-versioned-build
+  only:
+    - develop@evs/submission-service
+  environment:
+    name: evs-voting-tools
+    url: https://voting.evs-tools.e1c.net
+  script:
+    - ci-scripts/deploy-version.sh
