@@ -1,0 +1,47 @@
+{
+  "$schema": "http://json-schema.org/draft-06/schema#",
+  "$id": "choice.json",
+  "title": "Choice",
+  "description": "A Choice represents a discrete alternative decision within a Contest a Voter can choose to provide utility to.",
+  "type": "object",
+  "properties": {
+    "id": {
+      "title": "Choice ID",
+      "description": "The unique identifier for the Choice.",
+      "type": "string",
+      "maxLength": 256,
+      "default": ""
+    },
+    "name": {
+      "title": "Choice Name",
+      "description": "The human readable name of the Choice.",
+      "type": "string",
+      "maxLength": 1024,
+      "minLength": 1
+    },
+    "tags": {
+      "title": "Choice Tags",
+      "description": "The tags the Choice has an association with.",
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true,
+      "default": []
+    }
+  },
+  "required": [
+    "name",
+    "tags"
+  ],
+  "definitions": {
+    "choice-create": {
+      "$id": "#choice-create",
+      "title": "Choice Creation",
+      "description": "Structure for the act of creating a Choice.",
+      "allOf": [
+        {"$ref": "#"}
+      ]
+    }
+  }
+}

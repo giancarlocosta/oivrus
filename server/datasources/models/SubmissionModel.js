@@ -1,7 +1,7 @@
 module.exports = {
-  table_name: 'submission_by_user',
+  table_name: 'submission',
   fields: {
-    submissionid: 'uuid',
+    id: 'uuid',
     poll: 'uuid',
     choice: 'uuid',
     user: 'uuid',
@@ -11,5 +11,5 @@ module.exports = {
       typeDef: '<text, text>'
     }
   },
-  key: [['user'], 'poll']
+  key: ['id']
 };

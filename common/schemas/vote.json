@@ -1,0 +1,178 @@
+{
+  "$schema": "http://json-schema.org/draft-06/schema#",
+  "$id": "vote.json",
+  "title": "Vote",
+  "description": "A Vote is a collection of Choice Selections a Voters has decided to provide utility to.",
+  "type": "object",
+  "properties": {
+    "id": {
+      "title": "Vote ID",
+      "description": "The unique identifier for the Vote.",
+      "type": "string",
+      "maxLength": 256,
+      "minLength": 1
+    },
+    "selections": {
+      "title": "Vote Selections",
+      "description": "The Contests and their Choice Selections.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "oneOf": [
+          {
+            "properties": {
+              "contest": {
+                "type": "string",
+                "maxLength": 256,
+                "minLength": 1
+              },
+              "encryptedchoicedata": {
+                "description": "This will be a stringified encrypted version of the \"choice-data\" definition below",
+                "$ref": "data-uri.json"
+              }
+            },
+            "required": [
+              "contest",
+              "encryptedchoicedata"
+            ]
+          },
+          {
+            "properties": {
+              "contest": {
+                "type": "string",
+                "maxLength": 256,
+                "minLength": 1
+              },
+              "choicedata": {
+                "$ref": "#choice-data"
+              }
+            },
+            "required": [
+              "contest",
+              "choicedata"
+            ]
+          }
+        ]
+      },
+      "uniqueItems": true
+    },
+    "container": {
+      "enum": [ "contest", "ballotstyle" ]
+    },
+    "election": {
+      "title": "Vote Resource IDs",
+      "description": "The Election Resource IDs for the Vote.",
+      "type": "object",
+      "properties": {
+        "election": {
+          "description": "An Election ID.",
+          "type": "string"
+        },
+        "period": {
+          "description": "A Period ID.",
+          "type": "string"
+        },
+        "ballotstyle": {
+          "description": "A Ballotstyle ID.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "election",
+        "period",
+        "ballotstyle"
+      ]
+    },
+    "time": {
+      "title": "Vote Time",
+      "description": "The time the Vote was cast.",
+      "type": "string",
+      "format": "date-time"
+    },
+    "channel": {
+      "title": "Vote Channel",
+      "description": "The Channel the Vote was received from.",
+      "type": "string",
+      "enum": ["web", "paper", "phone"]
+    },
+    "voter": {
+      "title": "Vote ID",
+      "description": "The ID of the Voter submitting the Vote.",
+      "type": "string"
+    },
+    "encrypted": {
+      "title": "Encrypted Vote",
+      "description": "Whether the underlying Vote Selections are encrypted.",
+      "type": "boolean"
+    },
+    "mime": {
+      "title": "Vote Media Type",
+      "description": "The MIME Type of the Vote Selection(s).",
+      "TODO": "Think this out more.",
+      "type": "string",
+      "enum": [ "application/xml", "application/json", "application/jpeg", "application/mp3"]
+    }
+  },
+  "required": [
+    "selections",
+    "channel"
+  ],
+  "definitions": {
+    "vote-create": {
+      "$id": "#vote-create",
+      "title": "Vote Create",
+      "description": "The structure required for creating/submitting a Vote.",
+      "allOf": [
+        {"$ref": "#"}
+      ]
+    },
+    "choice-selection": {
+      "$id": "#choice-selection",
+      "title": "Choice Selection",
+      "description": "An individual Selection of a Choice.",
+      "properties": {
+        "contest": {
+          "description": "The Contest ID if the Selection.",
+          "type": "string",
+          "maxLength": 256,
+          "minLength": 1
+        },
+        "choice": {
+          "title": "Choice Value",
+          "description": "The Choice ID or arbitrary Write-In that the Voter Selected.",
+          "type": "string"
+        },
+        "weight": {
+          "title": "Choice Weight",
+          "description": "How much weight the Choice was given.  Only meaningful in a ranked order or proxy Contest.",
+          "type": "integer",
+          "default": 1
+        },
+        "writein": {
+          "title": "Choice Write-In",
+          "description": "Whether this is a Write-In Selection instead of an individual Choice.",
+          "type": "boolean",
+          "default": false
+        }
+      },
+      "required": [
+        "choice"
+      ]
+    },
+    "choice-data": {
+      "$id": "#choice-data",
+      "title": "A wrapper to hold any arbitrary data about the choices as well as the choices themselves.",
+      "type": "object",
+      "properties": {
+        "choices": {
+          "description": "The individual Choices selected by the Voter for the Contest.",
+          "type": "array",
+          "items": { "$ref": "#choice-selection" }
+        }
+      },
+      "required": [
+        "choices"
+      ]
+    }
+  }
+}

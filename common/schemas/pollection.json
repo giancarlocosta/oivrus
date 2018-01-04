@@ -1,0 +1,67 @@
+{
+  "$schema": "http://json-schema.org/draft-06/schema#",
+  "$id": "pollection.json",
+  "title": "Pollection",
+  "description": "An Pollection is a formal decision-making process by which a population make specific choices on given matters.",
+  "type": "object",
+  "properties": {
+    "id": {
+      "title": "Pollection ID",
+      "description": "The unique identifier for an Pollection.",
+      "type": "string",
+      "maxLength": 256,
+      "default": ""
+    },
+    "name": {
+      "title": "Pollection Name",
+      "description": "The human readable name for an Pollection.",
+      "type": "string",
+      "maxLength": 1024,
+      "minLength": 1
+    },
+    "polls": {
+      "title": "Pollection Polls",
+      "description": "The Pollection's unique Poll or their IDs.",
+      "type": "array",
+      "items": {
+        "oneOf": [
+          { "type": "string" },
+          { "$ref": "poll.json" }
+        ]
+      },
+      "uniqueItems": true
+    },
+    "config": {
+      "description": "UI Config?",
+      "type": ["object", "null"],
+      "patternProperties": {
+        "^[a-zA-Z0-9_]*$": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "name",
+    "polls"
+  ],
+  "definitions": {
+    "pollection-create":
+    {
+      "$id": "#pollection-create",
+      "title": "Pollection Creation",
+      "description": "Structure for the act of creating a Period.",
+      "allOf": [
+        {
+          "properties": {
+            "polls": {
+              "items": {"$ref": "poll.json#poll-create"}
+            }
+          }
+        },
+        {"$ref": "#"}
+      ]
+    }
+  }
+}

@@ -116,7 +116,7 @@
 
         $.ajax({
           type: "POST",
-          url: 'http://127.0.0.1:3000/api/test/polls/' + pollId + '/vote',
+          url: 'http://127.0.0.1:3000/api/test/polls/' + ('54ecb7b5-41f1-427f-b6df-d5e8d9315546'/*TODO remove*/ || pollId) + '/vote',
           data: JSON.stringify(data),
           contentType: "application/json; charset=utf-8",
           dataType: "json",
@@ -134,10 +134,19 @@
           var pageInfo = getPageInfo()
 
           var selected = $("#"+divId+" input[type='radio']:checked");
-          var selectedVal = selected.length > 0 ? selected.val() : "";
+          var selectedVal = selected.length > 0 ? selected.val() : null;
 
-          var userId = 1;
-          var data = { value: selectedVal, g: 1, pageInfo };
+          if (!selectedVal) return;
+
+          var userId = 'e9a6a03b-2b0f-4988-a39a-50694921e144';
+          var data = {
+            value: selectedVal,
+            choice: 'f8d917a3-89db-49c1-863a-7762a554c588',
+            user: userId,
+            meta: {
+              pageInfo
+            }
+          };
 
           submitVote(pollId, userId, data, function(err, res) {
             if (err) { return alert('Error: ' + response.responseText); }
@@ -150,6 +159,32 @@
 
         }, false);
       }
+
+      // function addRadioListener(pollId, formId, divId) {
+      //   console.log('SHIT')
+      //   console.log(JSON.stringify($("#"+divId+" input[type='radio']")))
+      //   $("input[type=radio][name='" + pollId + "']").each(function(x) {
+      //     console.log(x.val())
+      //   });
+      //   var radios = document.forms[formId].elements[pollId];
+      //   for(var i = 0, max = radios.length; i < max; i++) {
+      //     radios[i].onclick = function() {
+      //       console.log(this.value);
+      //       var pageInfo = getPageInfo()
+      //       var userId = 1;
+      //       var data = { value: this.value, g: 1, pageInfo };
+      //
+      //       submitVote(pollId, userId, data, function(err, res) {
+      //         if (err) { return alert('Error: ' + response.responseText); }
+      //
+      //         $("#"+divId).html('<br/><br/>Your vote was submitted!<br/><br/>');
+      //         setTimeout(function() {
+      //           $("#"+divId).hide();
+      //         }, 2000);
+      //       })
+      //     }
+      //   }
+      // }
 
       function createPollContainer(poll) {
         const id = poll.id;
@@ -189,12 +224,14 @@
             }
             $('#' + optionsDivId).append('<button class="submitContainer" id="'+submitButtonId+'">Submit</button>');
             addSubmitButtonListener(id, submitButtonId, optionsDivId);
+            //addRadioListener(id, formId, optionsDivId)
 
           }
 
           // Results Section
           console.log('Updating results')
-          $('#' + resultsDivId).html(JSON.stringify(pollObj.results));
+          //$('#' + resultsDivId).html(JSON.stringify(pollObj.results));
+          $('#' + resultsDivId).html(JSON.stringify(pollObj.results.map(function(x) { var o = {}; o[x.name] = x.votes; return o; })));
 
         })
 
@@ -211,22 +248,7 @@
 
       $('body').on('click', function(event) {
         // console.log('Click: ' + event.target)
-        // console.log($( "#pollsContainer" ).dialog('isOpen'))
-        // if ($( "#pollsContainer" ).dialog('isOpen')) {
-        //   if (event.target !== $( "#pollsContainer" )) {
-        //     $( "#pollsContainer" ).dialog( "close" );
-        //   }
-        // }
         //$('#pollsContainer').append('Clicked<br/>');
-      })
-
-
-      $('#polls-show').on('click', function(event) {
-        $( "#pollsContainer" ).dialog( "open" );
-      })
-
-      $('#polls-close').on('click', function(event) {
-        $( "#pollsContainer" ).dialog( "close" );
       })
 
       function surv() {
@@ -241,24 +263,40 @@
         createPollContainers([1,2,3,4]);
       }
 
-      try { $('#pollsContainer').remove(); } catch(e) {}
-      $('<div id="pollsContainer"></div>').appendTo('body');
 
-      $( "#pollsContainer" ).dialog({
-        autoOpen: false,
-        "open": function() {
-          $( ".text-box" ).addClass( "blur" );
-        },
-        "close": function() {
-          $( ".text-box" ).removeClass( "blur" );
+      try { $('#pollsContainer').remove(); } catch(e) {}
+      $('<div id="pollsContainer"></div>').appendTo('#modal-content');
+
+      // Get the modal
+      var modal = document.getElementById('myModal');
+
+      // Get the button that opens the modal
+      var btn = document.getElementById("myBtn");
+
+      // Get the <span> element that closes the modal
+      var span = document.getElementsByClassName("close")[0];
+
+      // When the user clicks on the button, open the modal
+      btn.onclick = function() {
+        modal.style.display = "block";
+      }
+
+      // When the user clicks on <span> (x), close the modal
+      span.onclick = function() {
+        modal.style.display = "none";
+      }
+
+      // When the user clicks anywhere outside of the modal, close it
+      window.onclick = function(event) {
+        if (event.target == modal) {
+          modal.style.display = "none";
         }
-      });
+      }
 
       surv();
       setInterval(function () {
         surv();
       }, 3000)
-
 
       //example jsonp call
       //var jsonp_url = "www.example.com/jsonpscript.js?callback=?";
@@ -268,7 +306,8 @@
       loadCss("http://127.0.0.1:8887/survio-widget.css");
 
       //example script load
-      //loadScript("http://example.com/anotherscript.js", function() { /* loaded */ });
+      // loadScript("http://code.jquery.com/jquery-1.11.1.min.js", function() { /* loaded */ });
+      // loadScript("http://code.jquery.com/ui/1.11.1/jquery-ui.min.js", function() { /* loaded */ });
 
     });
 

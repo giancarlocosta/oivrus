@@ -91,7 +91,7 @@ Promise.coroutine(function* () {
     // Do pre-server-start initialization
 
     logger.notice(`Connecting to DB...`);
-    //yield db.connect();
+    yield db.connect();
     logger.notice(`Connected to DB.`);
 
     // Start the server

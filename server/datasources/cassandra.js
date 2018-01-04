@@ -114,7 +114,7 @@ class DB {
           class: DB_REPLICATION_CLASS,
           replication_factor: DB_REPLICATION_FACTOR
         },
-        migration: 'safe',
+        migration: 'drop', // TODO set to 'safe' !!!
         createKeyspace: true
       };
 

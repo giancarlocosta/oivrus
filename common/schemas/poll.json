@@ -1,0 +1,317 @@
+{
+  "$schema": "http://json-schema.org/draft-06/schema#",
+  "$id": "poll.json",
+  "title": "Poll",
+  "description": "A Poll represents a discrete decision problem, with a limited set of available Choice alternatives to choose from.",
+  "type": "object",
+  "properties": {
+    "id": {
+      "title": "Poll ID",
+      "description": "The unique identifier for the Poll.",
+      "type": "string",
+      "maxLength": 256,
+      "default": ""
+    },
+    "name": {
+      "title": "Poll Name",
+      "description": "The human readable name of the Poll.",
+      "type": "string",
+      "maxLength": 1024,
+      "default": ""
+    },
+    "description": {
+      "title": "Poll Description",
+      "description": "The human readable description of the Poll.",
+      "type": "string",
+      "maxLength": 1024,
+      "default": ""
+    },
+    "tags": {
+      "title": "Poll tags",
+      "description": "",
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true,
+      "default": []
+    },
+    "choices": {
+      "title": "Poll Choices",
+      "description": "The set of Choices that may be selected from.",
+      "type": "array",
+      "items": { "$ref": "choice.json" },
+      "uniqueItems": true
+    },
+    "rules": {
+      "title": "Poll Rules",
+      "description": "A Set of Rules governing the behavioral dimensions of this Poll.",
+      "$ref": "#poll-rules"
+    },
+    "windows":  {
+      "title": "Poll Time Windows",
+      "description": "The Temporal Windows in which the Poll actively accepts Votes.",
+      "type": "array",
+      "items": {
+        "$ref": "#window"
+      },
+      "uniqueItems": true,
+      "minItems": 1
+    },
+    "config": {
+      "title": "Poll UI Configuration",
+      "description": "Poll Configuration information.",
+      "type": "object",
+      "properties": {
+        "selection": {
+          "title": "Selection type",
+          "description": "Whether only predefined choices are allowed or arbitary write-in choices may be submitted.",
+          "enum": [ "select", "writein" ],
+          "default": "select"
+        },
+        "multivote": {
+          "description": "Whether a voter can overwrite a previous vote",
+          "type": "string",
+          "enum": ["true","false"],
+          "default": "false"
+        },
+        "style": {
+          "description": "UI Styling?",
+          "type": ["object", "null"],
+          "patternProperties": {
+            "^[a-zA-Z0-9_]*$": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+      },
+      "patternProperties": {
+        "^[a-zA-Z0-9_]*$": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "selection"
+      ]
+    }
+  },
+  "required": [
+    "name",
+    "choices",
+    "rules",
+    "windows",
+    "config"
+  ],
+  "definitions": {
+    "poll-rules": {
+      "$id": "#poll-rules",
+      "title": "Poll Rules",
+      "description": "A Set of Rules governing the behavioral dimensions of a Poll.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "title": "Poll Rules Name",
+          "description": "The human readable name of the Poll Rules.",
+          "type": "string",
+          "maxLength": 256,
+          "default": ""
+        },
+        "voting": {
+          "title": "Voting Method",
+          "description": "A Voting Method is the manner in which ballots are marked and cast for a given Poll.",
+          "links": [
+            "https://en.wikipedia.org/wiki/Voting_method"
+          ],
+          "anyOf": [
+            {
+              "$ref": "#voting-methods"
+            }
+          ],
+          "default": "simple"
+        },
+        "tabulation": {
+          "title": "Electoral Method",
+          "description": "An Electoral Method or Tabulation is the manner in which votes are counted and an outcome of a given Poll determined.",
+          "links": [
+            "https://en.wikipedia.org/wiki/Electoral_method"
+          ],
+          "anyOf": [
+            {
+              "$ref": "#electoral-methods"
+            }
+          ],
+          "default": "majority"
+        },
+        "minselectable": {
+          "title": "Minimum Selections",
+          "description": "The minimum number of Choices that must be Selected for the Vote to potentially provide utility as a result of the Poll.",
+          "type": "integer",
+          "minimum": 0,
+          "default": 1
+        },
+        "maxselectable": {
+          "title": "Maximum Selections",
+          "description": "The maximum number of Choices that may be Selected to gain utility as a result of the Poll.",
+          "type": "integer",
+          "minimum": 1,
+          "default": 1
+        }
+      },
+      "required": [
+        "name",
+        "voting",
+        "tabulation",
+        "minselectable",
+        "maxselectable"
+      ]
+    },
+    "poll-create": {
+      "$id": "#poll-create",
+      "title": "Poll Creation",
+      "description": "Structure for the act of creating a Poll.",
+      "oneOf": [
+        {"$ref": "#poll-create-choices"}
+      ]
+    },
+    "poll-create-choices": {
+      "$id": "#poll-create-choices",
+      "title": "Poll Creation",
+      "description": "Structure for the act of creating a Poll with choices and all fields required by poll.json",
+      "allOf": [
+        {
+          "properties": {
+            "choices": {
+              "items": {"$ref": "choice.json#choice-create"}
+            }
+          }
+        },
+        {"$ref": "#"}
+      ]
+    },
+    "voting-methods": {
+      "$id": "#voting-methods",
+      "title": "Common Voting Methods",
+      "description": "Common/Well Known Voting Methods. These can greatly impact the UI behavior.",
+      "enum": [
+        "simple",
+        "ranked-choice",
+        "above-the-line",
+        "below-the-line",
+        "plurality-at-large",
+        "group-voting",
+        "general-ticket",
+        "bucklin-voting",
+        "proxy",
+        "plural-voting"
+      ]
+    },
+    "electoral-methods": {
+      "$id": "#electoral-methods",
+      "title": "Common Electoral Methods",
+      "description": "Common/Well Known Electoral / Tabulation Methods. These determine the manner in which votes are tabulated, how proportional representation is distributed, and in general the outcome of a Poll.",
+      "enum": [
+        "majority",
+        "super-majority",
+        "first-past-the-post",
+        "mixed-electoral",
+        "instant-runoff",
+        "bc-stv",
+        "scorporo",
+        "majority-bonus",
+        "exhaustive-ballot",
+        "sortition",
+        "borda-count",
+        "single-transferable-vote"
+      ]
+    },
+    "window": {
+      "$id": "#window",
+      "title": "Temporal Window",
+      "description": "The set of temporal contraints that define a Poll's Active Voting Lifecycle.",
+      "notes": [
+        "All times formatted as defined by JSON Schema: http://json-schema.org/latest/json-schema-validation.html#rfc.section.7.3.1, https://tools.ietf.org/html/rfc3339#section-5.6",
+        "All times have a UTC offset of UTC+0000"
+      ],
+      "type": "object",
+      "properties": {
+        "open": {
+          "title": "Opening Time",
+          "description": "Before this time, no Voters will be allowed to initiate active Voting Sessions.",
+          "type": "string",
+          "format": "date-time"
+        },
+        "close": {
+          "title": "Closing Time",
+          "description": "After this time, no more Voters will be allowed to initiate active Voting Sessions.",
+          "type": "string",
+          "format": "date-time"
+        },
+        "stop": {
+          "title": "Stopping Time",
+          "description": "After this time, no more Votes will be accepted.",
+          "oneof" : [
+            {
+              "type": "string",
+              "format": "date-time"
+            },
+            {"type": "null"}
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "open",
+        "close"
+      ]
+    },
+    "choice": {
+      "$id": "#choice",
+      "title": "Choice",
+      "description": "A Choice represents a discrete alternative decision within a Contest a Voter can choose to provide utility to.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "title": "Choice ID",
+          "description": "The unique identifier for the Choice.",
+          "type": "string",
+          "maxLength": 256,
+          "default": ""
+        },
+        "name": {
+          "title": "Choice Name",
+          "description": "The human readable name of the Choice.",
+          "type": "string",
+          "maxLength": 1024,
+          "minLength": 1
+        },
+        "tags": {
+          "title": "Choice Tags ",
+          "description": "The Tags the Choice has an association with.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true,
+          "default": []
+        }
+      },
+      "required": [
+        "name",
+        "tags"
+      ],
+      "definitions": {
+        "choice-create": {
+          "$id": "#choice-create",
+          "title": "Choice Creation",
+          "description": "Structure for the act of creating a Choice.",
+          "allOf": [
+            {"$ref": "#"}
+          ]
+        }
+      }
+    }
+
+  }
+}
