@@ -24,6 +24,7 @@ COPY package.json ./
 RUN npm set registry https://npm.e1c.net/ \
  && npm set //npm.e1c.net/:_authToken="$NPM_AUTH_TOKEN" \
  && npm install --prod --verbose
+ && modclean
 
 
 # Place the application code itself

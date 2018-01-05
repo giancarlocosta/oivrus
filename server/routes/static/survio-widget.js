@@ -62,7 +62,14 @@
 
     jQuery(document).ready(function ($) {
 
+      // var socket = io('http://0.0.0.0:3000');
+      // socket.emit('widget', { g: 'hi' });
+      // socket.on('msg', function(msg){
+      //   console.log('msg: ' + msg);
+      // });
+
       var pollCache = {};
+      var pollResultsCache = {};
 
       function scrapePolls() {
         var polls = {};
@@ -100,6 +107,32 @@
             success: function(data) {
               var poll = data.data;
               pollCache[id] = {
+                lastUpdated: Date.now(),
+                poll: poll
+              };
+              callback(null, poll)
+            }
+          })
+          .fail(function(err) { callback(err); })
+
+        }
+
+      }
+
+      function getPollResultsById(id, callback) {
+
+        if (pollResultsCache[id] && !stale(pollResultsCache[id].lastUpdated)) {
+
+          console.log('Getting Cached poll ' + id);
+          callback(null, pollResultsCache[id].poll);
+
+        } else {
+          console.log('Getting Server poll ' + id);
+          $.ajax({
+            url: 'http://127.0.0.1:3000/api/test/polls/' + id + '/results',
+            success: function(data) {
+              var poll = data.data;
+              pollResultsCache[id] = {
                 lastUpdated: Date.now(),
                 poll: poll
               };
@@ -151,40 +184,26 @@
           submitVote(pollId, userId, data, function(err, res) {
             if (err) { return alert('Error: ' + response.responseText); }
 
-            $("#"+divId).html('<br/><br/>Your vote was submitted!<br/><br/>');
-            setTimeout(function() {
-              $("#"+divId).hide();
-            }, 2000);
+            $("#"+buttonId).html('Vote Submitted!');
+            $("#"+buttonId).prop("disabled",true);
+            $(".radio-pick-"+pollId).hide();
           })
 
         }, false);
       }
 
-      // function addRadioListener(pollId, formId, divId) {
-      //   console.log('SHIT')
-      //   console.log(JSON.stringify($("#"+divId+" input[type='radio']")))
-      //   $("input[type=radio][name='" + pollId + "']").each(function(x) {
-      //     console.log(x.val())
-      //   });
-      //   var radios = document.forms[formId].elements[pollId];
-      //   for(var i = 0, max = radios.length; i < max; i++) {
-      //     radios[i].onclick = function() {
-      //       console.log(this.value);
-      //       var pageInfo = getPageInfo()
-      //       var userId = 1;
-      //       var data = { value: this.value, g: 1, pageInfo };
-      //
-      //       submitVote(pollId, userId, data, function(err, res) {
-      //         if (err) { return alert('Error: ' + response.responseText); }
-      //
-      //         $("#"+divId).html('<br/><br/>Your vote was submitted!<br/><br/>');
-      //         setTimeout(function() {
-      //           $("#"+divId).hide();
-      //         }, 2000);
-      //       })
-      //     }
-      //   }
-      // }
+      function updatePollResults(id) {
+        setInterval(function() {
+          console.log('Updating ' + id)
+          getPollResultsById(id, function(err, pollResultsObj) {
+            for (var i = 0; i < pollResultsObj.choices.length; i++) {
+              const p = pollResultsObj.choices[i];
+              const choiceResultDivId = 'choiceResultDiv' + p.id;
+              $('#' + choiceResultDivId).html(p.votes);
+            }
+          });
+        }, 5000)
+      }
 
       function createPollContainer(poll) {
         const id = poll.id;
@@ -219,19 +238,27 @@
             // console.log(pollObj.choices);
             for (var i = 0; i < pollObj.choices.length; i++) {
               const p = pollObj.choices[i];
-              $('#' + formId).append('<input type="radio" name="'+pollObj.id+'" value="'+p.name+'">'+p.name+'<br>');
+
+              const pickDivId = 'pickDiv' + p.id;
+              const choiceResultDivId = 'choiceResultDiv' + p.id;
+              $('#' + formId).append('<div class="pick" id="'+pickDivId+'"></div>');
+              $('#' + pickDivId).append('<input class="radio-pick-'+id+'" type="radio" name="'+pollObj.id+'" value="'+p.name+'">'+p.name + '\t');
+              $('#' + pickDivId).append('<div class="choice-result" id="'+choiceResultDivId+'">--</div>');
+
+              //$('#' + formId).append('<input type="radio" name="'+pollObj.id+'" value="'+p.name+'">'+p.name+'<br>');
               //console.log($(this).attr('id'))
             }
             $('#' + optionsDivId).append('<button class="submitContainer" id="'+submitButtonId+'">Submit</button>');
             addSubmitButtonListener(id, submitButtonId, optionsDivId);
             //addRadioListener(id, formId, optionsDivId)
 
+            updatePollResults(id); // Async interval update of poll results
+
           }
 
           // Results Section
           console.log('Updating results')
-          //$('#' + resultsDivId).html(JSON.stringify(pollObj.results));
-          $('#' + resultsDivId).html(JSON.stringify(pollObj.results.map(function(x) { var o = {}; o[x.name] = x.votes; return o; })));
+          //$('#' + resultsDivId).html(JSON.stringify(pollObj.results.map(function(x) { var o = {}; o[x.name] = x.votes; return o; })));
 
         })
 
@@ -266,26 +293,20 @@
 
       try { $('#pollsContainer').remove(); } catch(e) {}
       $('<div id="pollsContainer"></div>').appendTo('#modal-content');
-
       // Get the modal
       var modal = document.getElementById('myModal');
-
       // Get the button that opens the modal
       var btn = document.getElementById("myBtn");
-
       // Get the <span> element that closes the modal
       var span = document.getElementsByClassName("close")[0];
-
       // When the user clicks on the button, open the modal
       btn.onclick = function() {
         modal.style.display = "block";
       }
-
       // When the user clicks on <span> (x), close the modal
       span.onclick = function() {
         modal.style.display = "none";
       }
-
       // When the user clicks anywhere outside of the modal, close it
       window.onclick = function(event) {
         if (event.target == modal) {

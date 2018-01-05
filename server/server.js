@@ -26,6 +26,9 @@ const utils = require('../common/util.js');
 
 const app = express();
 
+const httpServer = http.Server(app);
+const io = require('socket.io')(httpServer);
+
 app.use(cors())
 
 // Default server parameters
@@ -95,27 +98,26 @@ Promise.coroutine(function* () {
     logger.notice(`Connected to DB.`);
 
     // Start the server
-    http.createServer(app).listen(SERVER_PORT, SERVER_HOST, () => {
+    //http.createServer(app).listen(SERVER_PORT, SERVER_HOST, () => {
+    httpServer.listen(SERVER_PORT, SERVER_HOST, () => {
       // This pid file is used by killservice.sh during testing. See package.json
       fs.appendFileSync(`/tmp/submission-service-process-pids`, `${process.pid}\n`);
       logger.notice(`submission-service PID: ${process.pid}`);
       logger.notice(`Server at ${SERVER_HOST}:${SERVER_PORT}${DEFAULT_ROOT}`);
     });
-    // openssl req -newkey rsa:2048 -nodes -keyout domain.key -x509 -days 365 -out domain.crt
-    // var key = fs.readFileSync('/Users/gcosta/Desktop/Me/Projects/survio/key.pem');
-    // var cert = fs.readFileSync( '/Users/gcosta/Desktop/Me/Projects/survio/cert.pem' );
-    // https.createServer({key, cert}, app).listen(3443, () => {
-    //   // This pid file is used by killservice.sh during testing. See package.json
-    //   fs.appendFileSync(`/tmp/submission-service-process-pids`, `${process.pid}\n`);
-    //   logger.notice(`submission-service PID: ${process.pid}`);
-    //   logger.notice(`Server at ${SERVER_HOST}:${SERVER_PORT}${DEFAULT_ROOT}`);
-    // });
-    // app.listen(SERVER_PORT, SERVER_HOST, () => {
-    //   // This pid file is used by killservice.sh during testing. See package.json
-    //   fs.appendFileSync(`/tmp/submission-service-process-pids`, `${process.pid}\n`);
-    //   logger.notice(`submission-service PID: ${process.pid}`);
-    //   logger.notice(`Server at ${SERVER_HOST}:${SERVER_PORT}${DEFAULT_ROOT}`);
-    // });
+    io.on('connection', function(socket){
+      console.log('a user connected');
+      socket.on('disconnect', function(){
+        console.log('user disconnected');
+      });
+      socket.emit('msg', 'from server');
+      socket.on('widget', function(msg){
+        console.log('widget'); console.log(msg);
+      });
+      socket.on('poll', function(msg){
+        console.log('poll'); console.log(msg);
+      });
+    });
 
   } catch (startupErr) {
     middleware.error.uncaughtExceptionHandler(startupErr);

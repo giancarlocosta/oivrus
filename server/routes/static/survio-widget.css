@@ -2,6 +2,19 @@
     background-color: #8FBC8F;
 }
 
+.choice-result {
+  display: inline-block;
+  background-color: #00FA9A;
+}
+
+.pick {
+  display: block;
+}
+
+#sp {
+  background-color: red;
+}
+
 .pollContainer {
     display: block;
 }

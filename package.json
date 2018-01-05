@@ -51,6 +51,7 @@
     "helmet": "3.8.2",
     "hpp": "0.2.2",
     "lodash": "4.17.4",
+    "modclean": "^2.1.2",
     "moment": "^2.20.1",
     "morgan": "1.9.0",
     "promise-retry": "1.1.1",
@@ -58,6 +59,7 @@
     "request-promise": "3.0.0",
     "requestretry": "1.12.2",
     "service-logger": "latest",
+    "socket.io": "^2.0.4",
     "uuid": "3.1.0"
   },
   "devDependencies": {
