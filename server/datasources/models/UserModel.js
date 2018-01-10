@@ -1,5 +1,7 @@
 module.exports = {
   table_name: 'user',
+  key: ['id'],
+  indexes: ['fname', 'lname'],
   fields: {
     id: 'uuid',
     fname: 'text',
@@ -10,7 +12,5 @@ module.exports = {
       type: 'set',
       typeDef: '<text>'
     }
-  },
-  key: ['id'],
-  indexes: ['fname', 'lname']
+  }
 };

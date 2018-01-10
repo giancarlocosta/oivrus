@@ -53,5 +53,10 @@ router.get('/webpage', coroutine(function* (req, res, next) {
   res.status(200).sendFile(path.resolve(`${__dirname}/../static/webpage.html`));
 }));
 
+router.get('/portal', coroutine(function* (req, res, next) {
+  var path = require('path');
+  res.status(200).sendFile(path.resolve(`${__dirname}/../static/portal.html`));
+}));
+
 
 module.exports = router;

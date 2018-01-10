@@ -1,5 +1,6 @@
 module.exports = {
   table_name: 'submission_by_user',
+  key: [['user'], 'poll'],
   fields: {
     submissionid: 'uuid',
     poll: 'uuid',
@@ -10,6 +11,5 @@ module.exports = {
       type: 'map',
       typeDef: '<text, text>'
     }
-  },
-  key: [['user'], 'poll']
+  }
 };

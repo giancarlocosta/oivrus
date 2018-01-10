@@ -26,15 +26,12 @@
       "maxLength": 1024,
       "default": ""
     },
-    "tags": {
-      "title": "Poll tags",
-      "description": "",
-      "type": "array",
-      "items": {
-        "type": "string"
-      },
-      "uniqueItems": true,
-      "default": []
+    "question": {
+      "title": "Poll Question",
+      "description": "The human readable question the Poll is measuring.",
+      "type": "string",
+      "maxLength": 1024,
+      "minLength": 5
     },
     "choices": {
       "title": "Poll Choices",
@@ -74,17 +71,7 @@
           "type": "string",
           "enum": ["true","false"],
           "default": "false"
-        },
-        "style": {
-          "description": "UI Styling?",
-          "type": ["object", "null"],
-          "patternProperties": {
-            "^[a-zA-Z0-9_]*$": {
-              "type": "string"
-            }
-          },
-          "additionalProperties": false
-        },
+        }
       },
       "patternProperties": {
         "^[a-zA-Z0-9_]*$": {
@@ -99,25 +86,44 @@
   },
   "required": [
     "name",
+    "question",
     "choices",
     "rules",
     "windows",
     "config"
   ],
   "definitions": {
+    "poll-create": {
+      "$id": "#poll-create",
+      "title": "Poll Creation",
+      "description": "Structure for the act of creating a Poll.",
+      "allOf": [
+        {
+          "properties": {
+            "choices": {
+              "items": {"$ref": "choice.json#choice-create"}
+            },
+            "tags": {
+              "title": "Poll tags",
+              "description": "",
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "uniqueItems": true,
+              "default": []
+            }
+          }
+        },
+        {"$ref": "#"}
+      ]
+    },
     "poll-rules": {
       "$id": "#poll-rules",
       "title": "Poll Rules",
       "description": "A Set of Rules governing the behavioral dimensions of a Poll.",
       "type": "object",
       "properties": {
-        "name": {
-          "title": "Poll Rules Name",
-          "description": "The human readable name of the Poll Rules.",
-          "type": "string",
-          "maxLength": 256,
-          "default": ""
-        },
         "voting": {
           "title": "Voting Method",
           "description": "A Voting Method is the manner in which ballots are marked and cast for a given Poll.",
@@ -160,34 +166,10 @@
         }
       },
       "required": [
-        "name",
         "voting",
         "tabulation",
         "minselectable",
         "maxselectable"
-      ]
-    },
-    "poll-create": {
-      "$id": "#poll-create",
-      "title": "Poll Creation",
-      "description": "Structure for the act of creating a Poll.",
-      "oneOf": [
-        {"$ref": "#poll-create-choices"}
-      ]
-    },
-    "poll-create-choices": {
-      "$id": "#poll-create-choices",
-      "title": "Poll Creation",
-      "description": "Structure for the act of creating a Poll with choices and all fields required by poll.json",
-      "allOf": [
-        {
-          "properties": {
-            "choices": {
-              "items": {"$ref": "choice.json#choice-create"}
-            }
-          }
-        },
-        {"$ref": "#"}
       ]
     },
     "voting-methods": {
@@ -247,18 +229,6 @@
           "description": "After this time, no more Voters will be allowed to initiate active Voting Sessions.",
           "type": "string",
           "format": "date-time"
-        },
-        "stop": {
-          "title": "Stopping Time",
-          "description": "After this time, no more Votes will be accepted.",
-          "oneof" : [
-            {
-              "type": "string",
-              "format": "date-time"
-            },
-            {"type": "null"}
-          ],
-          "default": null
         }
       },
       "required": [
@@ -286,6 +256,13 @@
           "maxLength": 1024,
           "minLength": 1
         },
+        "value": {
+          "title": "Choice Value",
+          "description": "The human readable value of the Choice.",
+          "type": "string",
+          "maxLength": 1024,
+          "minLength": 1
+        },
         "tags": {
           "title": "Choice Tags ",
           "description": "The Tags the Choice has an association with.",
@@ -299,6 +276,7 @@
       },
       "required": [
         "name",
+        "value",
         "tags"
       ],
       "definitions": {

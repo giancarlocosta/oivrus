@@ -62,21 +62,22 @@
 
     jQuery(document).ready(function ($) {
 
-      // var socket = io('http://0.0.0.0:3000');
-      // socket.emit('widget', { g: 'hi' });
-      // socket.on('msg', function(msg){
-      //   console.log('msg: ' + msg);
-      // });
+      var socket = io('http://0.0.0.0:3000');
+      socket.on('msg', function(msg){
+        console.log('msg: ' + JSON.stringify(msg));
+        if (msg.pollId) {
+          const streamDivId = 'streamDivId' + msg.pollId;
+          //const streamDivId = 'streamDivId' + 1;
+          console.log('streamDivId: ' + streamDivId);
+          $("#"+streamDivId).html(JSON.stringify(msg));
+          setTimeout(function() {
+            $("#"+streamDivId).html('...');
+          }, 3000);
+        }
+      });
 
       var pollCache = {};
       var pollResultsCache = {};
-
-      function uuidv4() {
-        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-          var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-          return v.toString(16);
-        });
-      }
 
       function scrapePolls() {
         var polls = {};
@@ -100,20 +101,6 @@
         return (Date.now() - timestamp) / 1000 > to;
       }
 
-      function getPollection(id, callback) {
-
-        console.log('Getting Server pollection ' + id);
-        $.ajax({
-          url: 'http://127.0.0.1:3000/api/pollections/' + id,
-          success: function(data) {
-            var pollection = data.data;
-            callback(null, pollection)
-          }
-        })
-        .fail(function(err) { callback(err); })
-
-      }
-
       function getPollById(id, callback) {
 
         if (pollCache[id] && !stale(pollCache[id].lastUpdated)) {
@@ -124,7 +111,7 @@
         } else {
           console.log('Getting Server poll ' + id);
           $.ajax({
-            url: 'http://127.0.0.1:3000/api/polls/' + id,
+            url: 'http://127.0.0.1:3000/api/test/polls/' + id,
             success: function(data) {
               var poll = data.data;
               pollCache[id] = {
@@ -150,7 +137,7 @@
         } else {
           console.log('Getting Server poll ' + id);
           $.ajax({
-            url: 'http://127.0.0.1:3000/api/polls/' + id + '/results',
+            url: 'http://127.0.0.1:3000/api/test/polls/' + id + '/results',
             success: function(data) {
               var poll = data.data;
               pollResultsCache[id] = {
@@ -166,26 +153,11 @@
 
       }
 
-      function getChoiceResultsById(id, callback) {
-
-        console.log('Getting Server poll ' + id);
-        $.ajax({
-          url: 'http://127.0.0.1:3000/api/choices/' + id + '/results',
-          success: function(data) {
-            var poll = data.data;
-            callback(null, poll)
-          }
-        })
-        .fail(function(err) { callback(err); })
-
-
-      }
-
       function submitVote(pollId, userId, data, callback) {
 
         $.ajax({
           type: "POST",
-          url: 'http://127.0.0.1:3000/api/polls/' + pollId + '/vote',
+          url: 'http://127.0.0.1:3000/api/test/polls/' + pollId + '/vote',
           data: JSON.stringify(data),
           contentType: "application/json; charset=utf-8",
           dataType: "json",
@@ -204,14 +176,13 @@
 
           var selected = $("#"+divId+" input[type='radio']:checked");
           var selectedVal = selected.length > 0 ? selected.val() : null;
-          var choiceId = selected.attr('id')
 
           if (!selectedVal) return;
 
-          var userId = uuidv4()//'e9a6a03b-2b0f-4988-a39a-50694921e144';
+          var userId = 'e9a6a03b-2b0f-4988-a39a-50694921e144';
           var data = {
             value: selectedVal,
-            choice: choiceId,
+            choice: 'f8d917a3-89db-49c1-863a-7762a554c588',
             user: userId,
             meta: {
               pageInfo
@@ -219,7 +190,7 @@
           };
 
           submitVote(pollId, userId, data, function(err, res) {
-            if (err) { return console.log('Error: ' + response.responseText); }
+            if (err) { return alert('Error: ' + response.responseText); }
 
             $("#"+buttonId).html('Vote Submitted!');
             $("#"+buttonId).prop("disabled",true);
@@ -242,20 +213,11 @@
         }, 5000)
       }
 
-      function updateChoiceResults(id) {
-        setInterval(function() {
-          console.log('Updating Choice: ' + id)
-          getChoiceResultsById(id, function(err, result) {
-            const choiceResultDivId = 'choiceResultDiv' + id;
-            $('#' + choiceResultDivId).html(result.count);
-          });
-        }, 5000)
-      }
-
       function createPollContainer(poll) {
         const id = poll.id;
         const pollContainerId = 'pollContainer' + id;
         const formId = 'form' + id;
+        const streamDivId = 'streamDivId' + id;
         const resultsDivId = 'resultsDiv' + id;
         const optionsDivId = 'optionsDiv' + id;
         const submitButtonId = 'pollSubmit' + id;
@@ -273,7 +235,8 @@
 
             //append a new form element with id mySearch to <body>
             $('#pollsContainer').append('<div class="pollContainer" id="'+pollContainerId+'"></div>');
-            $('#' + pollContainerId).append('<h2>'+pollObj.question+'</h2>');
+            $('#' + pollContainerId).append('<h2>'+pollObj.name+'</h2>');
+            $('#' + pollContainerId).append('<div class="streamContainer" id="'+streamDivId+'">...</div>');
 
             // Results Section
             $('#' + pollContainerId).append('<div class="resultsContainer" id="'+resultsDivId+'"></div>');
@@ -289,15 +252,11 @@
               const pickDivId = 'pickDiv' + p.id;
               const choiceResultDivId = 'choiceResultDiv' + p.id;
               $('#' + formId).append('<div class="pick" id="'+pickDivId+'"></div>');
-              $('#' + pickDivId).append('<input class="radio-pick-'+id+'" type="radio" id="'+p.id+'" name="'+pollObj.id+'" value="'+p.name+'">'+p.name + '\t');
+              $('#' + pickDivId).append(p.name + ': ');
               $('#' + pickDivId).append('<div class="choice-result" id="'+choiceResultDivId+'">--</div>');
-
-              updateChoiceResults(p.id); // Async interval update of choice results
             }
-            $('#' + optionsDivId).append('<button class="submitContainer" id="'+submitButtonId+'">Submit</button>');
-            addSubmitButtonListener(id, submitButtonId, optionsDivId);
 
-            //updatePollResults(id); // Async interval update of poll results
+            updatePollResults(id); // Async interval update of poll results
 
           }
 
@@ -318,69 +277,43 @@
         }
       }
 
-      function surv() {
-        console.log('Surving');
-
-        var pageInfo = getPageInfo(); //console.log('Page info: ' + JSON.stringify(pageInfo));
-
-        getPollection('b9daff63-778e-4582-8648-c6b473fdac7f', function(err, pollection) {
-          if (err) { console.log(err); return; }
-          createPollContainers(pollection.polls);
-        });
-      }
-
-
-      /*************************************************************************
-
-      MAIN
-
-      *************************************************************************/
-
-
-      //example jsonp call
-      //var jsonp_url = "www.example.com/jsonpscript.js?callback=?";
-      //$.getJSON(jsonp_url, function(result) { alert("win"); });
-
-      //example load css
-      loadCss("http://127.0.0.1:8887/survio-widget.css");
-
-      //example script load
-      // loadScript("http://code.jquery.com/jquery-1.11.1.min.js", function() { /* loaded */ });
-      // loadScript("http://code.jquery.com/ui/1.11.1/jquery-ui.min.js", function() { /* loaded */ });
-
       $('body').on('click', function(event) {
         // console.log('Click: ' + event.target)
         //$('#pollsContainer').append('Clicked<br/>');
       })
 
+      function surv() {
+        console.log('Surving');
 
-      try { $('#pollsContainer').remove(); } catch(e) {}
-      $('<div id="pollsContainer"></div>').appendTo('#modal-content');
-      // Get the modal
-      var modal = document.getElementById('myModal');
-      // Get the button that opens the modal
-      var btn = document.getElementById("myBtn");
-      // Get the <span> element that closes the modal
-      var span = document.getElementsByClassName("close")[0];
-      // When the user clicks on the button, open the modal
-      btn.onclick = function() {
-        modal.style.display = "block";
-      }
-      // When the user clicks on <span> (x), close the modal
-      span.onclick = function() {
-        modal.style.display = "none";
-      }
-      // When the user clicks anywhere outside of the modal, close it
-      window.onclick = function(event) {
-        if (event.target == modal) {
-          modal.style.display = "none";
-        }
+        var polls = scrapePolls();
+        //console.log('Polls: ' + JSON.stringify(polls));
+
+        var pageInfo = getPageInfo();
+        //console.log('Page info: ' + JSON.stringify(pageInfo));
+
+        createPollContainers([
+          '11111111-1111-1111-1111-111111111111',
+          '22222222-2222-2222-2222-222222222222',
+          '33333333-3333-3333-3333-333333333333',
+          '44444444-4444-4444-4444-444444444444'
+        ]);
       }
 
       surv();
       setInterval(function () {
         surv();
       }, 3000)
+
+      //example jsonp call
+      //var jsonp_url = "www.example.com/jsonpscript.js?callback=?";
+      //$.getJSON(jsonp_url, function(result) { alert("win"); });
+
+      //example load css
+      loadCss("http://127.0.0.1:8887/survio-portal.css");
+
+      //example script load
+      // loadScript("http://code.jquery.com/jquery-1.11.1.min.js", function() { /* loaded */ });
+      // loadScript("http://code.jquery.com/ui/1.11.1/jquery-ui.min.js", function() { /* loaded */ });
 
     });
 

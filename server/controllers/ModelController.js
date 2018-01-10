@@ -1,10 +1,11 @@
 const root = '../..';
+const _ = require('lodash');
 const Promise = require('bluebird');
 const co = Promise.coroutine;
 const uuid = require('uuid/v4');
 const logger = new (require('service-logger'))(__filename);
-const utils = require(root + '/common/util.js');
-const evsSchemas = require('evs-data-schemas');
+const utils = require(`${root}/common/util.js`);
+const schemas = require(`${root}/common/data-schemas.js`);
 
 const db = require('../datasources/cassandra.js');
 
@@ -21,7 +22,11 @@ class ModelController {
   * evs-data-schemas (unless you specify a different schema when validating)
   */
   constructor(modelType) {
-    this._modelType = modelType.toLowerCase();
+    this._modelType = modelType;
+    // Make sure the modelType refers to one of the defined cassandra models
+    setTimeout(function () {
+      if (!db.models.instance[modelType]) { throw new Error(`No ORM Model found for Model type: ${modelType}`); }
+    }, 1000);
   }
 
   get ormInstance() {
@@ -60,7 +65,7 @@ class ModelController {
     }
     data.id = uuid();
     const OrmInstance = this.ormInstance;
-    const instance = new OrmInstance(utils.objToLower(data));
+    const instance = new OrmInstance(utils.objToLower(this.convertUUIDs(origObj)));
     const result = await instance.saveAsync(ormOptions);
     await this.checkTransaction(result, 'POST');
     return data;
@@ -199,16 +204,36 @@ class ModelController {
 
 
     if (schema) {
-      if (!evsSchemas.validator.validate(schema, data)) {
-        await utils.rejectError('InvalidError', JSON.stringify(evsSchemas.validator.errors));
+      if (!schemas.validator.validate(schema, data)) {
+        await utils.rejectError('InvalidError', JSON.stringify(schemas.validator.errors));
       }
     } else {
-      if (!evsSchemas.validator.validate(`${this._modelType}`, data)) {
-        await utils.rejectError('InvalidError', JSON.stringify(evsSchemas.validator.errors));
+      if (!schemas.validator.validate(`${this._modelType}`, data)) {
+        await utils.rejectError('InvalidError', JSON.stringify(schemas.validator.errors));
       }
     }
     return;
   }
+
+
+  convertUUIDs(origObj) {
+
+    const schema = this.ormInstance._properties.schema.fields;
+    const origCopy = _.cloneDeep(origObj);
+    const newObj = _.transform(origCopy, function(result, val, key) {
+      if (schema[key] === 'uuid') {
+        if (val && val.length > 0) {
+          result[key] = db.models.uuidFromString(val);
+        } else {
+          result[key] = undefined;
+        }
+      } else {
+        result[key] = val;
+      }
+    });
+    return newObj;
+  }
+
 
   modelSchema() {
     return this._schema;

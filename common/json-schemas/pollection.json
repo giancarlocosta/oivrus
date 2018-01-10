@@ -19,15 +19,29 @@
       "maxLength": 1024,
       "minLength": 1
     },
+    "description": {
+      "title": "Pollection description",
+      "description": "The human readable description for an Pollection.",
+      "type": "string",
+      "maxLength": 1024,
+      "minLength": 1
+    },
+    "tags": {
+      "title": "Poll tags",
+      "description": "",
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true,
+      "default": []
+    },
     "polls": {
       "title": "Pollection Polls",
       "description": "The Pollection's unique Poll or their IDs.",
       "type": "array",
       "items": {
-        "oneOf": [
-          { "type": "string" },
-          { "$ref": "poll.json" }
-        ]
+        "type": "string"
       },
       "uniqueItems": true
     },
@@ -53,13 +67,6 @@
       "title": "Pollection Creation",
       "description": "Structure for the act of creating a Period.",
       "allOf": [
-        {
-          "properties": {
-            "polls": {
-              "items": {"$ref": "poll.json#poll-create"}
-            }
-          }
-        },
         {"$ref": "#"}
       ]
     }

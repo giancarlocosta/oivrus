@@ -27,7 +27,8 @@ const utils = require('../common/util.js');
 const app = express();
 
 const httpServer = http.Server(app);
-const io = require('socket.io')(httpServer);
+let io = (new (require('./datasources/socket.js'))(httpServer)).io();
+
 
 app.use(cors())
 
@@ -116,6 +117,7 @@ Promise.coroutine(function* () {
       });
       socket.on('poll', function(msg){
         console.log('poll'); console.log(msg);
+        socket.emit('msg', msg);
       });
     });
 

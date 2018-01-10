@@ -7,18 +7,15 @@ module.exports = {
   },
 
   rules: {
-    name: 'text',
     voting: 'text',
     tabulation: 'text',
     minselectable: 'int',
     maxselectable: 'int',
-    advancing: 'int'
   },
 
   window: {
     open: 'text',
-    stop: 'text',
-    close: 'text'
+    stop: 'text'
   }
 
 };

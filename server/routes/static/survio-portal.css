@@ -1,0 +1,78 @@
+#pollsContainer {
+    /*background-color: #8FBC8F;*/
+}
+
+.choice-result {
+  display: inline-block;
+  background-color: #00FA9A;
+}
+
+.pick {
+  display: block;
+}
+
+#sp {
+  background-color: red;
+}
+
+.pollContainer {
+    display: block;
+}
+
+.resultsContainer {
+  width: 45%;
+  display: inline;
+  /*float: right;*/
+}
+
+.optionsContainer {
+  width: 45%;
+  display: inline;
+  /*float: left;*/
+}
+
+.submitContainer {
+  clear: both;
+}
+
+
+/********************************** MODAL ************************************/
+
+
+/* The Modal (background) */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Content/Box */
+.modal-content {
+    background-color: #fefefe;
+    margin: 10% auto; /* 15% from the top and centered */
+    padding: 20px;
+    border: 3px solid #888;
+    width: 60%; /* Could be more or less, depending on screen size */
+}
+
+/* The Close Button */
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}

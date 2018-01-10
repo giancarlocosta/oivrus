@@ -1,6 +1,6 @@
 module.exports = {
-  table_name: 'submission_by_poll',
-  key: [['poll', 'halfday'], 'user'],
+  table_name: 'submission_by_choice',
+  key: [['choice', 'halfday'], 'user'],
   fields: {
     submissionid: 'uuid',
     poll: 'uuid',

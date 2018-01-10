@@ -1,5 +1,6 @@
 module.exports = {
   table_name: 'submission_by_choice_hour',
+  key: [['choice', 'hour'], 'ts', 'user'],
   fields: {
     submissionid: 'uuid',
     poll: 'uuid',
@@ -11,6 +12,5 @@ module.exports = {
       type: 'map',
       typeDef: '<text, text>'
     }
-  },
-  key: [['choice', 'hour'], 'ts', 'user']
+  }
 };
