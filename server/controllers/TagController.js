@@ -103,16 +103,24 @@ class TagController extends ModelController {
     const self = this;
     return co(function* () {
       let result = {};
-      const queries = [
-        {
-          query: 'INSERT INTO polls_by_tag (tag, poll) VALUES (?, ?)',
-          params: [ tagName, db.models.uuidFromString(pollId) ]
-        },
-        {
-          query: 'INSERT INTO tags_by_poll (tag, poll) VALUES (?, ?)',
-          params: [ tagName, db.models.uuidFromString(pollId) ]
-        }
-      ];
+      const queries = [];
+
+      // Check if pollrank field already exists. If not initialize to 0. If so, don't touch!
+      const poll = yield PollsByTagController.find(tagName, { queryFilters: { poll: pollId } }).catch((err) => { if (err.message !== 'NotFoundError') { throw err; } });
+      const pollrankSet = poll && poll.pollrank && typeof poll.pollrank === 'number';
+      queries.push({
+        query: `INSERT INTO polls_by_tag (tag, poll${pollrankSet ? '' : ', pollrank'}) VALUES (?, ?${pollrankSet? '' : ', ?'})`,
+        params: (function () {
+          const pollsByTagInsertValues = [ tagName, db.models.uuidFromString(pollId) ];
+          if (!pollrankSet) { pollsByTagInsertValues.push(0); };
+          return pollsByTagInsertValues;
+        })()
+      });
+
+      queries.push({
+        query: 'INSERT INTO tags_by_poll (tag, poll) VALUES (?, ?)',
+        params: [ tagName, db.models.uuidFromString(pollId) ]
+      });
       yield db.client.batch(queries, { prepare: true });
       return Promise.resolve(result);
     })();

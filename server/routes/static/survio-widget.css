@@ -2,6 +2,27 @@
     background-color: #8FBC8F;
 }
 
+.widget-button {
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 12px;
+    margin: 4px 2px;
+    cursor: pointer;
+}
+
+.widget-button:hover {background-color: #3e8e41}
+
+.widget-button:active {
+  background-color: #3e8e41;
+  box-shadow: 0 5px #666;
+  transform: translateY(4px);
+}
+
 .choice-result {
   display: inline-block;
   background-color: #00FA9A;

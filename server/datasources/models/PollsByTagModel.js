@@ -1,4 +1,6 @@
 /*
+Table for finding polls with a tag.
+View is to list the most popular polls with the tag
 Use pollrank for sorting.
 NOTE: Rank = num of voters on a poll. Update Rank as votes roll in
 */
@@ -13,7 +15,7 @@ module.exports = {
   materialized_views: {
     pollrank_by_tag: {
       select: ['poll', 'tag', 'pollrank'],
-      key: [['tag'], 'poll', 'pollrank'],
+      key: [['tag'], 'pollrank', 'poll'],
       clustering_order: {"pollrank": "desc"}
     }
   }

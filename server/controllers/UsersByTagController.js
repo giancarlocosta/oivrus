@@ -32,28 +32,19 @@ class UsersByTagController extends ModelController {
   *   on success resolve with found object or array of found objects
   *   else reject with error
   */
-  find(resourceId, options) {
+  find(tag, options) {
     const self = this;
     return co(function* () {
       options.queryFilters = options.queryFilters || {};
-      
+
       let result = {};
 
-      if (options.queryFilters.tag) {
-
-        const filters = { tag: options.queryFilters.tag };
-        if (options.queryFilters.user) {
-          filters.user = db.models.uuidFromString(options.queryFilters.user);
-          result = yield self.read(filters);
-        } else {
-          result = yield self.list(filters, {doPage: true, page: options.queryFilters.page, limit: options.queryFilters.limit});
-        }
-
+      const filters = { tag: tag };
+      if (options.queryFilters.user) {
+        filters.user = db.models.uuidFromString(options.queryFilters.user);
+        result = yield self.read(filters);
       } else {
-
-        result = yield self.list({}, {doPage: true, page: options.queryFilters.page, limit: options.queryFilters.limit});
-        const total = yield db.client.execute(`SELECT count(*) FROM users_by_tag`, [], {});
-        result._meta = { totalItems: parseInt(total.rows[0].count, 10) };
+        result = yield self.list(filters, {doPage: true, page: options.queryFilters.page, limit: options.queryFilters.limit});
       }
 
       return Promise.resolve(result);
