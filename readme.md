@@ -1,4 +1,6 @@
-# Submission Service
+# ABANDONED/INCOMPLETE
+
+[https://business.pinterest.com/en/save-button](See this example)
 
 > Service that stores audit events from external services
 
@@ -14,10 +16,6 @@
 
 
 ## Overview
-
-The Submission Service stores and displays events that external services create. These
-events are stored in Submission Service's DB table, as well as forwarded to Author
-Service (for now) so that audit logs can be generated.
 
 
 ## API Documentation
@@ -35,7 +33,7 @@ _See [bin/](#bin) for all utility scripts and commands._
 
 Requirements for running the application:
 
-* Node.js >= 6.10
+* Node.js >= 8
 * Docker
 
 ### Building
@@ -86,29 +84,14 @@ Jobs defined in the Gitlab CI configuration file can be tested locally by instal
 runner](https://docs.gitlab.com/runner/install/) and then running `bin/ci.sh JOB_NAME`, where
 `JOB_NAME` is the name of a job defined in `.gitlab-ci.yml`.
 
-_NOTE:_ Submission Service pushes events to external services (Author for now), whose
-responses may need to be mocked.
+_NOTE:_ This Service may use external services whose responses may need to be mocked.
 See [MockServer Docs](http://www.mock-server.com/) for docs on how to mock responses
 and tests in the `test/` folder for example usage.
 
 
 ## APIs Consumed
 
-
-#### Author Service
-Submission Service needs to communicate with Author Service to forward audit events
-to the Legacy system:
-
-
-* POST `author-service/bg/events[?event_code][?election_id][?message]`
-
-
-## Audit Events
-
-The `key` property of any events posted to the Submission Service will be checked
-against the Event Logger repo events config maps and if the `key` doesn't match
-one of those events a `DEFAULT_EVENT` value will be assigned to `key`.
-
+TODO
 
 ## Implementation
 
@@ -237,3 +220,5 @@ Each route _should_ have a Controller associated with it. These components can
 "know" about the API  (i.e. they will be able to return Errors that are specific
 to the API, they'll be able to optionally handle Express components such as Request,
 Response, etc) More on Errors above.
+
+[https://business.pinterest.com/en/save-button](See this example)
