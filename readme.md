@@ -218,4 +218,4 @@ Each route _should_ have a Controller associated with it. These components can
 to the API, they'll be able to optionally handle Express components such as Request,
 Response, etc) More on Errors above.
 
-["https://business.pinterest.com/en/save-button"](See this example)
+[https://business.pinterest.com/en/save-button](https://business.pinterest.com/en/save-button)
